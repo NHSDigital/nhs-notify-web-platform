@@ -38,6 +38,29 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
+  # Custom origin
+  dynamic "origin" {
+    for_each = var.cloudfront_origins
+    content {
+      domain_name = origin.value.domain_name
+      origin_id   = origin.value.origin_id
+      origin_path = origin.value.origin_path
+      custom_origin_config {
+        http_port              = origin.value.custom_origin_config.http_port
+        https_port             = origin.value.custom_origin_config.https_port
+        origin_protocol_policy = origin.value.custom_origin_config.origin_protocol_policy
+        origin_ssl_protocols   = origin.value.custom_origin_config.origin_ssl_protocols
+      }
+      dynamic "custom_header" {
+        for_each = origin.value.custom_header
+        content {
+          name  = custom_header.value.name
+          value = custom_header.value.value
+        }
+      }
+    }
+  }
+
   # Static assets S3 content
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
@@ -57,6 +80,32 @@ resource "aws_cloudfront_distribution" "cdn" {
     default_ttl            = var.cloudfront_default_ttl
     max_ttl                = var.cloudfront_max_ttl
     compress               = true
+
+    # TODO: Auth Lambda needs adding
+    # lambda_function_association {
+    #   event_type   = "viewer-response"
+    #   lambda_arn   = var.cloudfront_edge_arn
+    #   include_body = false
+    # }
+  }
+
+  # Custom behaviour
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_origins
+    content {
+      path_pattern     = "/${ordered_cache_behavior.value.path_pattern}*"
+      allowed_methods  = ordered_cache_behavior.value.allowed_methods
+      cached_methods   = ordered_cache_behavior.value.cached_methods
+      target_origin_id = ordered_cache_behavior.value.origin_id
+
+      cache_policy_id = ordered_cache_behavior.value.cache_policy_id
+
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = var.cloudfront_min_ttl
+      default_ttl            = var.cloudfront_default_ttl
+      max_ttl                = var.cloudfront_max_ttl
+      compress               = true
+    }
   }
 
   dynamic "custom_error_response" {

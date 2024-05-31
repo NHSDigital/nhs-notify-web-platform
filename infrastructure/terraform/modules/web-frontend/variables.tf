@@ -72,3 +72,29 @@ variable "bucket_logging_bucket" {
   type        = string
   description = "Name of the bucket access logging bucket"
 }
+
+variable "cloudfront_origins" {
+  type = list(object(
+    {
+      domain_name = optional(string, "")
+      origin_id   = optional(string, "")
+      origin_path = optional(string, "")
+      custom_origin_config = optional(object({
+        http_port              = optional(string, "")
+        https_port             = optional(string, "")
+        origin_protocol_policy = optional(string, "")
+        origin_ssl_protocols   = optional(list(string), [])
+      }), {})
+      custom_header = optional(list(object({
+        name  = optional(string, "")
+        value = optional(string, "")
+      })), [])
+      path_pattern    = optional(string, "")
+      allowed_methods = optional(list(string), ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"])
+      cached_methods  = optional(list(string), ["GET", "HEAD"])
+      cache_policy_id = optional(string, "2e54312d-136d-493c-8eb9-b001f22f67d2")
+  }))
+
+  description = "Cloudfront origin config"
+  default     = []
+}

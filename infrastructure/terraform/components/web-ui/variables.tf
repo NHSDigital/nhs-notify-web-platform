@@ -108,3 +108,28 @@ variable "terraform_root_dir" {
   type        = string
   description = "Absolute path to Terraform directory"
 }
+
+variable "cloudfront_origins" {
+  description = "Cloudfront origin config"
+  default     = []
+  type = list(object(
+    {
+      domain_name = optional(string, "")
+      origin_id   = optional(string, "")
+      origin_path = optional(string, "")
+      custom_origin_config = optional(object({
+        http_port              = optional(string, "")
+        https_port             = optional(string, "")
+        origin_protocol_policy = optional(string, "")
+        origin_ssl_protocols   = optional(list(string), [])
+      }), {})
+      custom_header = optional(list(object({
+        name  = optional(string, "")
+        value = optional(string, "")
+      })), [])
+      path_pattern    = optional(string, "")
+      allowed_methods = optional(list(string), ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"])
+      cached_methods  = optional(list(string), ["GET", "HEAD"])
+      cache_policy_id = optional(string, "2e54312d-136d-493c-8eb9-b001f22f67d2") # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html, using Amplify based managed cache policy for behaviour
+  }))
+}
