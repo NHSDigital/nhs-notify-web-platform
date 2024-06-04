@@ -106,8 +106,8 @@ jobs:
     needs: [metadata]
     timeout-minutes: 10
     env:
-      TERRAFORM_ACTION: ${{ metadata.outputs.terraform_action }}
-      CI_PIPELINE_IID: ${{ metadata.outputs.ci_pipeline_iid }}
+      TERRAFORM_ACTION: ${{ needs.metadata.outputs.terraform_action }}
+      CI_PIPELINE_IID: ${{ needs.metadata.outputs.ci_pipeline_iid }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -116,7 +116,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE }}
           role-session-name: deployInfra
-          aws-region: ${{ metadata.outputs.aws_region }}
+          aws-region: ${{ needs.metadata.outputs.aws_region }}
       - name:  Terraform Plan
         if: >-
           always() &&
