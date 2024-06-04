@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-function get_color() {
+function get_colour() {
   echo "$(git config --get-color "" "${1:-white} ")"
 }
 
@@ -9,12 +9,12 @@ bin_dir="$(dirname "${BASH_SOURCE[0]}")";
 component="$(echo ${*:-} | grep -Eo  "\-\-component ([a-z]*)" | awk '{print $2}')";
 action="$(echo ${*:-} | grep -Eo  "\-\-action ([a-z]*)" | awk '{print $2}')";
 
-color_yellow=$(get_color yellow)
-color_red="$(get_color red)"
-color_white_on_red="$(get_color 'white red')"
-color_green="$(get_color green)"
-color_cyan="$(get_color cyan)"
-color_magenta="$(get_color magenta)"
+color_yellow=$(get_colour yellow)
+color_red="$(get_colour red)"
+color_white_on_red="$(get_colour 'white red')"
+color_green="$(get_colour green)"
+color_cyan="$(get_colour cyan)"
+color_magenta="$(get_colour magenta)"
 color_reset="$(git config --get-color "" "reset")"
 
 if [[ "$(uname)" == "Darwin" ]]; then

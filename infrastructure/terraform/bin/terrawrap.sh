@@ -7,7 +7,7 @@
 set -e
 set -o pipefail
 
-function get_color() {
+function get_colour() {
   echo "$(git config --get-color "" "${1:-white} bold")"
 }
 
@@ -27,11 +27,11 @@ if [[ "${environment}" =~ ^de-[a-zA-Z0-9_]{3,6}$ && ! -f "./etc/env_eu-west-2_${
     > "./etc/env_eu-west-2_${environment}.tfvars";
 fi;
 
-color_yellow=$(get_color yellow)
-color_red="$(get_color red)"
-color_white_on_red="$(get_color 'white red')"
-color_green="$(get_color green)"
-color_cyan="$(get_color cyan)"
+color_yellow=$(get_colour yellow)
+color_red="$(get_colour red)"
+color_white_on_red="$(get_colour 'white red')"
+color_green="$(get_colour green)"
+color_cyan="$(get_colour cyan)"
 color_reset="$(git config --get-color "" "reset")"
 
 summary_file_tmp="${component,,}_${action}_output.tmp"

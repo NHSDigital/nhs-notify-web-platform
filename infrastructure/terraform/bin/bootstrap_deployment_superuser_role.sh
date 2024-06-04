@@ -18,12 +18,17 @@ if [[ ! "${confirmation^^}" =~ ^(Y|YES)$ ]]; then
   exit 1
 fi
 
+if [[ "$(uname)" == "Darwin" ]]; then
+    TAIL_CMD="tail -n +2"
+else
+    TAIL_CMD="tail +2"
+fi
 
 account_id=$(aws sts get-caller-identity | jq '.Account' | sed 's/\"//g')
 HOST=$(curl https://vstoken.actions.githubusercontent.com/.well-known/openid-configuration \
 | jq -r '.jwks_uri | split("/")[2]')
 thumbprint_list=$(  echo | openssl s_client -servername $HOST -showcerts -connect $HOST:443 2> /dev/null \
-| sed -n -e '/BEGIN/h' -e '/BEGIN/,/END/H' -e '$x' -e '$p' | tail +2 \
+| sed -n -e '/BEGIN/h' -e '/BEGIN/,/END/H' -e '$x' -e '$p' | $TAIL_CMD \
 | openssl x509 -fingerprint -noout \
 | sed -e "s/.*=//" -e "s/://g" \
 | tr "ABCDEF" "abcdef" )

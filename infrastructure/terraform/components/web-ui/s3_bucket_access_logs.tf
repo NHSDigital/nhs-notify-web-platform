@@ -1,28 +1,28 @@
-resource "aws_s3_bucket" "bucket_access_logs" {
+resource "aws_s3_bucket" "access_logs" {
   bucket        = "${local.csi_global}-bucket-logs"
   force_destroy = true
 }
 
-resource "aws_s3_bucket_ownership_controls" "bucket_access_logs" {
-  bucket = aws_s3_bucket.bucket_access_logs.id
+resource "aws_s3_bucket_ownership_controls" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
 
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_policy" "bucket_access_logs" {
-  bucket = aws_s3_bucket.bucket_access_logs.id
-  policy = data.aws_iam_policy_document.bucket_access_logs_bucket_policy.json
+resource "aws_s3_bucket_policy" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  policy = data.aws_iam_policy_document.access_logs_bucket_policy.json
 }
 
-data "aws_iam_policy_document" "bucket_access_logs_bucket_policy" {
+data "aws_iam_policy_document" "access_logs_bucket_policy" {
   statement {
     effect  = "Deny"
     actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.bucket_access_logs.arn,
-      "${aws_s3_bucket.bucket_access_logs.arn}/*",
+      aws_s3_bucket.access_logs.arn,
+      "${aws_s3_bucket.access_logs.arn}/*",
     ]
 
     principals {
@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "bucket_access_logs_bucket_policy" {
     effect  = "Allow"
     actions = ["s3:PutObject"]
     resources = [
-      "${aws_s3_bucket.bucket_access_logs.arn}/*",
+      "${aws_s3_bucket.access_logs.arn}/*",
     ]
 
     principals {
@@ -60,12 +60,12 @@ data "aws_iam_policy_document" "bucket_access_logs_bucket_policy" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "bucket_access_logs" {
+resource "aws_s3_bucket_public_access_block" "access_logs" {
   depends_on = [
-    aws_s3_bucket.bucket_access_logs,
-    aws_s3_bucket_policy.bucket_access_logs
+    aws_s3_bucket.access_logs,
+    aws_s3_bucket_policy.access_logs
   ]
-  bucket = aws_s3_bucket.bucket_access_logs.id
+  bucket = aws_s3_bucket.access_logs.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -73,8 +73,8 @@ resource "aws_s3_bucket_public_access_block" "bucket_access_logs" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_access_logs" {
-  bucket = aws_s3_bucket.bucket_access_logs.bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -83,16 +83,16 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_access_log
   }
 }
 
-resource "aws_s3_bucket_versioning" "bucket_access_logs" {
-  bucket = aws_s3_bucket.bucket_access_logs.id
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
 
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "bucket_access_logs" {
-  bucket                = aws_s3_bucket.bucket_access_logs.id
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket                = aws_s3_bucket.access_logs.id
   expected_bucket_owner = local.this_account
 
   rule {

@@ -2,8 +2,13 @@
 
 set -euo pipefail
 
-input_file="${1:-env_eu-west-2_uat2.tfvars}"
+input_file="${1:-}"
 output="${2:-json}"
+
+if [[ -z "${input_file}" ]]; then
+  echo "Pass a valid tfvars file"
+  exit 1
+fi
 
 json_input="{"$( \
   cat ${input_file} | \

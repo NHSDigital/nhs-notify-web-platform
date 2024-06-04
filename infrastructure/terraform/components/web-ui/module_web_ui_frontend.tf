@@ -16,6 +16,6 @@ module "web_ui_frontend" {
 
   cdn_waf_acl_arn = aws_wafv2_web_acl.cdn_no_allowlist.arn
 
-  bucket_logging_bucket = aws_s3_bucket.bucket_access_logs.bucket
+  bucket_logging_bucket = aws_s3_bucket.access_logs.bucket
 
 }

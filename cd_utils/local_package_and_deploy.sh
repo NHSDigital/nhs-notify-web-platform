@@ -2,12 +2,12 @@
 
 set -euo pipefail
 
-tf_project="${1:-notify-web-platform}"
+tf_project="${1:-notify-web-gateway}"
 environment="${2:-dev}"
 action="${3:-plan}"
 rebuild="${4:-no_rebuild}"
 component="web-ui"
-project="nhs-notify-web-platform"
+project="nhs-notify-web-gateway"
 
 # root_package_json="$(dirname ${BASH_SOURCE[0]})/../${project}/app.json"
 # tf_project="$(jq -r ".comms_pipeline.terraform_project" "${root_package_json}")"
@@ -39,7 +39,7 @@ pushd "infrastructure/terraform"
 # ./bin/download_static_content.sh
 
 if [ "${action}" == "state" ] || [ "${action}" == "import" ]; then
-  echo -e "We need to provide some arguments for in a format like e.g. :::  -- rm -dry-run module.apim_mock[0].module.api_frontend_apim_mock.module.lambda_openapi.aws_api_gateway_deployment.main"
+  echo -e "We need to provide some arguments for in a format like e.g. :::  -- rm -dry-run aws_s3_bucket.bucket_name"
   read -p "Please provide additional arguments for this action::  " arg5
 fi
 

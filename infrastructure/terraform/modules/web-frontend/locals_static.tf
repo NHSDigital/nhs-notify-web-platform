@@ -1,31 +1,4 @@
 locals {
-  # Map from file suffixes to the corresponding Content-Type values
-  file_types = {
-    "txt"    = "text/plain; charset=utf-8"
-    "html"   = "text/html; charset=utf-8"
-    "htm"    = "text/html; charset=utf-8"
-    "xhtml"  = "application/xhtml+xml"
-    "css"    = "text/css; charset=utf-8"
-    "js"     = "application/javascript"
-    "xml"    = "application/xml"
-    "json"   = "application/json"
-    "jsonld" = "application/ld+json"
-    "gif"    = "image/gif"
-    "jpeg"   = "image/jpeg"
-    "jpg"    = "image/jpeg"
-    "png"    = "image/png"
-    "svg"    = "image/svg+xml"
-    "webp"   = "image/webp"
-    "weba"   = "audio/webm"
-    "webm"   = "video/webm"
-    "pdf"    = "application/pdf"
-    "ico"    = "image/vnd.microsoft.icon"
-    "ttf"    = "font/ttf"
-    "woff"   = "font/woff"
-    "woff2"  = "font/woff2"
-    "otf"    = "font/otf"
-  }
-
   cloudfront_error_map = {
     "400" : { error_code : 400, response_page_path : "/error/400", response_code : "400" },
     "403" : { error_code : 403, response_page_path : "/error/403", response_code : "403" },

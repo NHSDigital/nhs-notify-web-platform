@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-function get_color() {
+function get_colour() {
   echo "$(git config --get-color "" "${1:-white} bold")"
 }
 
-color_yellow=$(get_color yellow)
-color_red="$(get_color red)"
-color_white_on_red="$(get_color 'white red')"
-color_green="$(get_color green)"
-color_cyan="$(get_color cyan)"
-color_white="$(get_color white)"
+color_yellow=$(get_colour yellow)
+color_red="$(get_colour red)"
+color_white_on_red="$(get_colour 'white red')"
+color_green="$(get_colour green)"
+color_cyan="$(get_colour cyan)"
+color_white="$(get_colour white)"
 color_reset="$(git config --get-color "" "reset")"
 
 function show_progress() {

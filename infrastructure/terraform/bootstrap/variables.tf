@@ -6,7 +6,7 @@ variable "project" {
 variable "aws_account_id" {
   type        = string
   description = "The AWS Account ID into which we are bootstrapping tfscaffold"
-  default     = "654654408172"
+  default     = "211125352330"
 }
 
 variable "account_ids" {

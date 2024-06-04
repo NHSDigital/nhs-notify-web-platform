@@ -101,15 +101,6 @@ resource "aws_wafv2_web_acl" "cdn_no_allowlist" {
       rate_based_statement {
         limit              = var.waf_rate_limit_cdn
         aggregate_key_type = "IP"
-        # scope_down_statement {
-        #   not_statement {
-        #     statement {
-        #       ip_set_reference_statement {
-        #         arn = aws_wafv2_ip_set.github_nat.arn
-        #       }
-        #     }
-        #   }
-        # }
       }
     }
     visibility_config {

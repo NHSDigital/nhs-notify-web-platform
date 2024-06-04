@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-function get_color() {
+function get_colour() {
   echo "$(git config --get-color "" "${1:-white} bold")"
 }
 
-color_yellow=$(get_color yellow)
-color_red="$(get_color red)"
-color_green="$(get_color green)"
-color_cyan="$(get_color cyan)"
+color_yellow=$(get_colour yellow)
+color_red="$(get_colour red)"
+color_green="$(get_colour green)"
+color_cyan="$(get_colour cyan)"
 color_reset="$(git config --get-color "" "reset")"
 
 component_name="${1:-no_component}"
