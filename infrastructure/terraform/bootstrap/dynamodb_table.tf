@@ -9,7 +9,7 @@ resource "aws_dynamodb_table" "terraform_statelock" {
   }
 
   tags = {
-    Name        = "CaaS Platform Terraform Scaffold State lock table for account ${var.aws_account_id} in region ${var.region}"
+    Name        = "Notify Web-UI Platform Terraform Scaffold State lock table for account ${var.aws_account_id} in region ${var.region}"
     Environment = var.environment
     Project     = var.project
     Component   = var.component

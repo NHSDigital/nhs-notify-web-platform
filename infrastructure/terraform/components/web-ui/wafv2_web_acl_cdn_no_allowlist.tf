@@ -1,7 +1,7 @@
 resource "aws_wafv2_web_acl" "cdn_no_allowlist" {
   provider    = aws.us-east-1
   name        = "${local.csi}-cdn-no-allowlist"
-  description = "WAFv2 for CaaS Cohort Explorer Web application ${var.environment} with no IP Allowlist"
+  description = "WAFv2 for Notify Web-UI Cohort Explorer Web application ${var.environment} with no IP Allowlist"
   scope       = "CLOUDFRONT"
 
   default_action {
