@@ -112,7 +112,7 @@ jobs:
         uses: ./.github/actions/terraform_testing
         with:
           folder: infrastructure
-          terraform_project: notify-web-platform
+          terraform_project: notify-web-gateway
           component: web-ui
           environment: dev
   count-lines-of-code:
