@@ -35,7 +35,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 concurrency:
-  group: caas-${{ github.workflow }}-${{ github.event.inputs.deployEnvironment }}
+  group: notify-web-ui-${{ github.workflow }}-${{ github.event.inputs.deployEnvironment }}
   cancel-in-progress: false
 
 jobs:
