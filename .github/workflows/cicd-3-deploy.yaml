@@ -81,7 +81,7 @@ jobs:
           echo "terraform_action=${{ inputs.terraformAction }}" >> $GITHUB_OUTPUT
           deploy_environment=${{ inputs.deployEnvironment }}
           if [[ $deploy_environment == de-*  ]]; then
-            $deploy_environment="dynamic"
+            deploy_environment="dynamic"
           fi
           echo "deploy_environment=$deploy_environment" >> $GITHUB_OUTPUT
       - name: "List variables"
