@@ -105,19 +105,6 @@ cd "${original_dir}" || exit 1;
 if [[ "${terraform_command}" == "apply" ]]; then
   show_progress 90 "Writing ${color_cyan}post-terraform facts${color_reset} to the pipeline json file..." "color_green";
 
-  # add_to_target_env=(
-  #   deployment_account_id
-  #   deployment_account_name
-  # )
-
-  # insert_values="."
-
-  # for field_name in ${add_to_target_env[@]}; do
-  #   insert_values="${insert_values:-} | .components.terraform.${field_name} = \"$(jq -r .${field_name}.value ${basedir}/${terraform_component}_output.json)\""
-  # done
-
-  # temp_json="$(jq --indent 2 "${insert_values}" "target-env.json")"
-  # echo "${temp_json}" | jq . > "target-env.json"
 
 deployment_account_id="$(jq -rc '.deployment_account_id.value' ${basedir}/${terraform_component}_output.json)"
 echo "deployed_account=${deployment_account_id}" >> $GITHUB_OUTPUT

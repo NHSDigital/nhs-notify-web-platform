@@ -9,16 +9,12 @@ rebuild="${4:-no_rebuild}"
 component="web-ui"
 project="nhs-notify-web-gateway"
 
-# root_package_json="$(dirname ${BASH_SOURCE[0]})/../${project}/app.json"
-# tf_project="$(jq -r ".comms_pipeline.terraform_project" "${root_package_json}")"
-# component="$(jq -r ".comms_pipeline.terraform_component" "${root_package_json}")"
-# default_environment="$(jq -r ".comms_pipeline.default_environment" "${root_package_json}")"
 
-# if [[ "${environment:0:3}" == "de-" ]]; then
-#   tfvars_environment="dynamic"
-# else
-#   tfvars_environment="${environment}"
-# fi
+if [[ "${environment:0:3}" == "de-" ]]; then
+  tfvars_environment="dynamic"
+else
+  tfvars_environment="${environment}"
+fi
 
 if [[ ! "${action}" == "plan" && ! "${action}" == "apply" && ! "${action}" == "state" && ! "${action}" == "show" && ! "${action}" == "import" ]]; then
   echo "ERROR: second arg should be 'plan' or 'apply' or 'state' or 'show' or 'import'" && exit 1

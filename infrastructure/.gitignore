@@ -19,8 +19,9 @@ crash.*.log
 *.tfvars.json
 **/plugin-cache/**/*
 
-# don't track target-env.tfvars that are dynamically created
+# don't track target-env.tfvars and dynamic.tfvars that are dynamically created
 group_target-env.tfvars
+*de-*.tfvars
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
