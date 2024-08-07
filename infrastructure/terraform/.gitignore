@@ -3,6 +3,10 @@
 # Local .terraform directories
 **/.terraform/*
 
+# Mapped directories for NHS Notify build context
+etc
+bin
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
