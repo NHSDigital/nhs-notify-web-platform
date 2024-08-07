@@ -4,8 +4,7 @@
 **/.terraform/*
 
 # Mapped directories for NHS Notify build context
-etc
-bin
+etc/*.tfvars
 
 # .tfstate files
 *.tfstate
