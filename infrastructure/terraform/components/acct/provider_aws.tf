@@ -1,13 +1,15 @@
 provider "aws" {
   region = var.region
 
+  allowed_account_ids = [
+    var.aws_account_id,
+  ]
+
   default_tags {
     tags = local.default_tags
   }
 }
 
-
-# Provider specifically for deploying to us-east-1, e.g. for cloudfront, ACM, etc.
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
@@ -15,4 +17,8 @@ provider "aws" {
   default_tags {
     tags = local.default_tags
   }
+
+  allowed_account_ids = [
+    var.aws_account_id,
+  ]
 }

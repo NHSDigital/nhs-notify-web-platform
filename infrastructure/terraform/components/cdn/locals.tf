@@ -1,60 +1,19 @@
 locals {
+  root_domain_name = "${var.environment}.${local.acct.dns_zone["name"]}" # e.g. [main|dev|abxy0].web-frontend.[dev|nonprod|prod].nhsnotify.national.nhs.uk
+  aws_lambda_functions_dir_path = "../../../../lambdas"
 
-  # Compound Scope Identifier
-  csi = replace(
-    format(
-      "%s-%s-%s",
-      var.project,
-      var.environment,
-      var.component,
-    ),
-    "_",
-    "",
-  )
-
-  # CSI for use in resources with a global namespace, i.e. S3 Buckets
-  csi_global = replace(
-    format(
-      "%s-%s-%s-%s",
-      local.base_parameter_bundle.project,
-      local.this_account,
-      local.base_parameter_bundle.region,
-      local.base_parameter_bundle.environment
-    ),
-    "_",
-    "",
-  )
-
-  base_parameter_bundle = {
-    project                             = var.project
-    environment                         = var.environment
-    component                           = var.component
-    group                               = var.group
-    region                              = var.region
-    account_ids                         = var.account_ids
-    account_name                        = var.account_name
-    default_kms_deletion_window_in_days = var.default_kms_deletion_window_in_days
-    default_tags                        = local.deployment_default_tags
-    pipeline_overrides                  = jsondecode(var.pipeline_overrides)
-    terraform_root_dir                  = var.terraform_root_dir
+  cloudfront_error_map = {
+    "400" : { error_code : 400, response_page_path : "/error/400", response_code : "400" },
+    "403" : { error_code : 403, response_page_path : "/error/403", response_code : "403" },
+    "404" : { error_code : 404, response_page_path : "/error/404", response_code : "404" },
+    "405" : { error_code : 405, response_page_path : "/error/400", response_code : "405" },
+    "414" : { error_code : 414, response_page_path : "/error/400", response_code : "414" },
+    "416" : { error_code : 416, response_page_path : "/error/400", response_code : "416" },
+    "500" : { error_code : 500, response_page_path : "/error/500", response_code : "500" },
+    "501" : { error_code : 501, response_page_path : "/error/500", response_code : "501" },
+    "502" : { error_code : 502, response_page_path : "/error/400", response_code : "502" },
+    "503" : { error_code : 503, response_page_path : "/error/503", response_code : "503" },
+    "504" : { error_code : 504, response_page_path : "/error/400", response_code : "504" },
   }
-
-  parameter_bundle = merge(
-    local.base_parameter_bundle, {
-      iam_resource_arns = local.iam_resource_arns,
-    }
-  )
-
-  deployment_default_tags = {
-    AccountId   = var.account_ids[var.account_name]
-    AccountName = var.account_name
-    Project     = var.project
-    Environment = var.environment
-    Component   = var.component
-    Group       = var.group
-    Module      = var.module
-  }
-
-  this_account = local.base_parameter_bundle.account_ids[local.base_parameter_bundle.account_name]
 }
 
