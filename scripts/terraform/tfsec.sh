@@ -13,11 +13,11 @@ set -euo pipefail
 function main() {
   # shellcheck disable=SC2086
   tfsec \
-	 --concise-output \
-	 --force-all-dirs \
-	 --exclude-downloaded-modules \
-	 --config-file scripts/config/tfsec.yml \
-	 --format text
+    --concise-output \
+    --force-all-dirs \
+    --exclude-downloaded-modules \
+    --config-file scripts/config/tfsec.yml \
+    --format text
 }
 
 main "$@"
