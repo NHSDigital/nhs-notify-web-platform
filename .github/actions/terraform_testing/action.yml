@@ -48,14 +48,7 @@ runs:
       run: |-
         cd ./${{ inputs.folder }}/terraform && \
         ./bin/wait_for_lock.sh ${{ inputs.terraform_project }} ${{ inputs.component }} ${{ inputs.environment }}
-    - name: Run Terraform Compliance against the plan file
+    - name: Run TFSec
       shell: bash
-      run: |-
-        cd ./${{ inputs.folder }}/terraform && \
-        ./bin/terratest.sh \
-          --region "${{ inputs.region }}" \
-          --project "${{ inputs.terraform_project }}" \
-          --component "${{ inputs.component }}" \
-          --environment "${{ inputs.environment }}" \
-          --group "${{ inputs.group }}" \
-          --action "plan"
+      run: |
+        ./scripts/terraform/tfsec.sh

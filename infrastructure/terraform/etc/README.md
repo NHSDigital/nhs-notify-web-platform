@@ -1,6 +1,6 @@
 # THIS DIRECTORY SHOULD BE IGNORED IN THE CONTEXT OF THE NHS NOTIFY PROGRAMME AND IS INTENDED FOR INDEPENDENT DEVELOPMENT USE ONLY
 
-## Example configuration files may look like this with the global.tfvars forming the base, any configuration will override with a most specific config taking presidence. env > region > group > Global
+## Example configuration files may look like this with the global.tfvars forming the base, any configuration will override with a most specific file taking presidence. env > region > group > Global
 
 ```env_eu-west-2_example.tfvars
 environment = "example"
