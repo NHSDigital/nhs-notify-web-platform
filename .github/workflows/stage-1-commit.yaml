@@ -102,8 +102,10 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
-      - name: "Terraform Compliance"
-        uses: ./.github/actions/terraform_testing
+      - name: Run TFSec
+        shell: bash
+        run: |
+          ./scripts/terraform/tfsec.sh
   count-lines-of-code:
     name: "Count lines of code"
     runs-on: ubuntu-latest
