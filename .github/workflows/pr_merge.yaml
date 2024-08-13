@@ -24,7 +24,7 @@ jobs:
             --arg releaseVersion "main" \
             --arg targetEnvironment "main" \
             --arg targetAccountGroup "nhs-notify-web-dev" \
-            --arg targetComponent "branch" \
+            --arg targetComponent "cdn" \
             --arg terraformAction "apply" \
             '{ "ref": "main",
               "inputs": {
