@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Terraform Scaffold
 #
 # A wrapper for running terraform projects
@@ -8,7 +8,7 @@
 ##
 # Set Script Version
 ##
-readonly script_ver="1.7.0";
+readonly script_ver="1.8.1";
 
 ##
 # Standardised failure function
@@ -38,6 +38,7 @@ Usage: ${0} \\
   -e/--environment   [environment] \\
   -g/--group         [group]
   -i/--build-id      [build_id] (optional) \\
+  -l/--lockfile      [mode] \\
   -p/--project       [project] \\
   -r/--region        [region] \\
   -d/--detailed-exitcode \\
@@ -48,13 +49,13 @@ Usage: ${0} \\
 
 action:
   - Special actions:
-      * plan / plan-destroy
-      * apply / destroy
-      * graph
-      * taint / untaint
-      * shell
+    * plan / plan-destroy
+    * apply / destroy
+    * graph
+    * taint / untaint
+    * shell
   - Generic actions:
-      * See https://www.terraform.io/docs/commands/
+    * See https://www.terraform.io/docs/commands/
 
 bucket_prefix (optional):
   Defaults to: "\${project_name}-tfscaffold"
@@ -98,6 +99,9 @@ no-color (optional):
 compact-warnings (optional):
   Append -compact-warnings to all terraform calls
 
+lockfile:
+  Append -lockfile=MODE to calls to terraform init
+
 additional arguments:
   Any arguments provided after "--" will be passed directly to terraform as its own arguments
 EOF
@@ -116,11 +120,11 @@ fi
 ##
 readonly raw_arguments="${*}";
 ARGS=$(getopt \
-          -o dhnvwa:b:c:e:g:i:p:r: \
-          -l "help,version,bootstrap,action:,bucket-prefix:,build-id:,component:,environment:,group:,project:,region:,detailed-exitcode,no-color,compact-warnings" \
-          -n "${0}" \
-          -- \
-          "$@");
+        -o dhnvwa:b:c:e:g:i:l:p:r: \
+        -l "help,version,bootstrap,action:,bucket-prefix:,build-id:,component:,environment:,group:,project:,region:,lockfile:,detailed-exitcode,no-color,compact-warnings" \
+        -n "${0}" \
+        -- \
+        "$@");
 
 #Bad arguments
 if [ $? -ne 0 ]; then
@@ -142,6 +146,7 @@ declare project;
 declare detailed_exitcode;
 declare no_color;
 declare compact_warnings;
+declare lockfile;
 
 while true; do
   case "${1}" in
@@ -199,6 +204,13 @@ while true; do
       shift;
       if [ -n "${1}" ]; then
         build_id="${1}";
+        shift;
+      fi;
+      ;;
+    -l|--lockfile)
+      shift;
+      if [ -n "${1}" ]; then
+        lockfile="-lockfile=${1}";
         shift;
       fi;
       ;;
@@ -269,6 +281,7 @@ if [ "${bootstrap}" == "true" ]; then
     && error_and_die "The --bootstrap parameter and the -c/--component parameter are mutually exclusive";
   [ -n "${build_id}" ] \
     && error_and_die "The --bootstrap parameter and the -i/--build-id parameter are mutually exclusive. We do not currently support plan files for bootstrap";
+  [ -n "${environment_arg}" ] && readonly environment="${environment_arg}";
 else
   # Validate component to work with
   [ -n "${component_arg}" ] \
@@ -386,13 +399,16 @@ fi;
 pushd "${component_path}";
 readonly component_name=$(basename ${component_path});
 
-# Check for presence of tfenv (https://github.com/kamatama41/tfenv)
-# and a .terraform-version file. If both present, ensure required
-# version of terraform for this component is installed automagically.
-tfenv_bin="$(which tfenv 2>/dev/null)";
-if [[ -n "${tfenv_bin}" && -x "${tfenv_bin}" && -f .terraform-version ]]; then
-  ${tfenv_bin} install;
-fi;
+# install terraform
+# verify terraform version matches .tool-versions
+echo ${PWD}
+tool_version=$(grep "terraform " .tool-versions | cut -d ' ' -f 2)
+asdf plugin-add terraform && asdf install terraform "${tool_version}"
+current_version=$(terraform --version | head -n 1 | cut -d 'v' -f 2)
+
+if [ -z "${current_version}" ] || [ "${current_version}" != "${tool_version}" ]; then
+  error_and_die "Terraform version mismatch. Expected: ${tool_version}, Actual: ${current_version}"
+fi
 
 # Regardless of bootstrapping or not, we'll be using this string.
 # If bootstrapping, we will fill it with variables,
@@ -409,7 +425,7 @@ if [ "${bootstrap}" == "true" ]; then
   tf_var_params+=" -var bucket_name=${bucket}";
 fi;
 
-# Run component-specific pre.sh
+# Run pre.sh
 if [ -f "pre.sh" ]; then
   source pre.sh "${region}" "${environment}" "${action}" \
     || error_and_die "Component pre script execution failed with exit code ${?}";
@@ -581,7 +597,7 @@ readonly backend_config="terraform {
     region         = \"${region}\"
     bucket         = \"${bucket}\"
     key            = \"${backend_key}\"
-    dynamodb_table = \"${project}-terraform-statelock\"
+    dynamodb_table = \"${bucket}\"
   }
 }";
 
@@ -619,9 +635,12 @@ if [ "${bootstrapped}" == "true" ]; then
   # Nix the horrible hack on exit
   trap "rm -f $(pwd)/backend_tfscaffold.tf" EXIT;
 
+  declare lockfile_or_upgrade;
+  [ -n ${lockfile} ] && lockfile_or_upgrade='-upgrade' || lockfile_or_upgrade="${lockfile}";
+
   # Configure remote state storage
   echo "Setting up S3 remote state from s3://${bucket}/${backend_key}";
-  terraform init -upgrade ${no_color} ${compact_warnings} \
+  terraform init ${no_color} ${compact_warnings} ${lockfile_or_upgrade} \
     || error_and_die "Terraform init failed";
 else
   # We are bootstrapping. Download the providers, skip the backend config.
@@ -629,6 +648,7 @@ else
     -backend=false \
     ${no_color} \
     ${compact_warnings} \
+    ${lockfile} \
     || error_and_die "Terraform init failed";
 fi;
 
@@ -667,7 +687,6 @@ case "${action}" in
     fi;
 
     if [ -n "${build_id}" ]; then
-      terraform show -json "build/${plan_file_name}" > "${base_path}/test/${plan_file_name}.json"
       aws s3 cp build/${plan_file_name} s3://${bucket}/${plan_file_remote_key} \
         || error_and_die "Plan file upload to S3 failed (s3://${bucket}/${plan_file_remote_key})";
     fi;
@@ -693,7 +712,7 @@ case "${action}" in
       if [ $(terraform version | head -n1 | cut -d" " -f2 | cut -d"." -f1) == "v0" ] && [ $(terraform version | head -n1 | cut -d" " -f2 | cut -d"." -f2) -lt 15 ]; then
         echo "Compatibility: Adding to terraform arguments: -force";
         force='-force';
-      else
+      elif [ "${action}" != "refresh" ]; then
         extra_args+=" -auto-approve";
       fi;
     fi;
@@ -716,8 +735,6 @@ case "${action}" in
         ${force} \
         ${apply_plan};
       exit_code=$?;
-
-      terraform output --json > "${base_path}/${component_name}_output.json"
     else
       terraform "${action}" \
         -input=false \
@@ -728,13 +745,11 @@ case "${action}" in
         ${force};
       exit_code=$?;
 
-      terraform output --json > "${base_path}/${component_name}_output.json"
-
       if [ "${bootstrapped}" == "false" ]; then
         # If we are here, and we are in bootstrap mode, and not already bootstrapped,
         # Then we have just bootstrapped for the first time! Congratulations.
         # Now we need to copy our state file into the bootstrap bucket
-          echo -e "${backend_config}" > backend_tfscaffold.tf \
+        echo -e "${backend_config}" > backend_tfscaffold.tf \
           || error_and_die "Failed to write backend config to $(pwd)/backend_tfscaffold.tf";
 
         # Nix the horrible hack on exit
@@ -742,7 +757,7 @@ case "${action}" in
 
         # Push Terraform Remote State to S3
         # TODO: Add -upgrade to init when we drop support for <0.10
-        echo "yes" | terraform init || error_and_die "Terraform init failed";
+        echo "yes" | terraform init ${lockfile} || error_and_die "Terraform init failed";
 
         # Hard cleanup
         rm -f backend_tfscaffold.tf;
@@ -771,7 +786,7 @@ case "${action}" in
     terraform "${action}" ${tf_var_params} ${extra_args} || error_and_die "Terraform ${action} failed.";
     ;;
   'shell')
-    echo -e "Here's a shell for the ${component} component.\nIf you want to run terraform actions specific to the ${environment} environment, pass the following options to your terraform commands:\n\n${tf_var_params} ${extra_args}\n\n'exit 0' / 'Ctrl-D' to continue, other exit codes will abort tfscaffold with the same code.";
+    echo -e "Here's a shell for the ${component} component.\nIf you want to run terraform actions specific to the ${environment}, pass the following options:\n\n${tf_var_params} ${extra_args}\n\n'exit 0' / 'Ctrl-D' to continue, other exit codes will abort tfscaffold with the same code.";
     bash -l || exit "${?}";
     ;;
   *)
