@@ -73,59 +73,97 @@ resource "aws_cloudfront_distribution" "main" {
     compress               = true
   }
 
+# Amplify microservice routing
+  dynamic "origin" {
+    for_each = var.amplify_microservice_routes
 
-  # TODO: Custom origin
-  # dynamic "origin" {
-  #   for_each = var.cloudfront_origins
-  #   content {
-  #     domain_name = origin.value.domain_name
-  #     origin_id   = origin.value.origin_id
-  #     origin_path = origin.value.origin_path
-  #     custom_origin_config {
-  #       http_port              = origin.value.custom_origin_config.http_port
-  #       https_port             = origin.value.custom_origin_config.https_port
-  #       origin_protocol_policy = origin.value.custom_origin_config.origin_protocol_policy
-  #       origin_ssl_protocols   = origin.value.custom_origin_config.origin_ssl_protocols
-  #     }
-  #     dynamic "custom_header" {
-  #       for_each = origin.value.custom_header
-  #       content {
-  #         name  = custom_header.value.name
-  #         value = custom_header.value.value
-  #       }
-  #     }
-  #   }
-  # }
+    content {
+      domain_name = origin.value.root_dns_record
+      origin_id   = "${local.csi}-${origin.value.service_prefix}"
 
+      custom_origin_config {
+        http_port = 80
+        https_port = 443
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols = [
+          "TLSv1.2"
+        ]
+      }
+      custom_header {
+        name = "x-amplify-base-url"
+        value = origin.value.root_dns_record
+      }
+    }
+  }
 
-#   # Custom behaviour
-#   dynamic "ordered_cache_behavior" {
-#     for_each = var.cloudfront_origins
-#     content {
-#       path_pattern     = "/${ordered_cache_behavior.value.path_pattern}*"
-#       allowed_methods  = ordered_cache_behavior.value.allowed_methods
-#       cached_methods   = ordered_cache_behavior.value.cached_methods
-#       target_origin_id = ordered_cache_behavior.value.origin_id
+  dynamic "ordered_cache_behavior" {
+    for_each = var.amplify_microservice_routes
+    content {
+      path_pattern     = "/${ordered_cache_behavior.value.service_prefix}"
+      allowed_methods  = [
+        "DELETE",
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT"
+      ]
 
-#       cache_policy_id = ordered_cache_behavior.value.cache_policy_id
+      cached_methods   = [
+        "GET",
+        "HEAD"
+      ]
 
-#       viewer_protocol_policy = "redirect-to-https"
-#       min_ttl                = var.cloudfront_min_ttl
-#       default_ttl            = var.cloudfront_default_ttl
-#       max_ttl                = var.cloudfront_max_ttl
-#       compress               = true
-#     }
-#   }
+      forwarded_values {
+        query_string = false
+        cookies {
+          forward = "none"
+        }
+      }
 
-#   dynamic "custom_error_response" {
-#     for_each = local.cloudfront_error_map
-#     content {
-#       error_caching_min_ttl = 0
-#       error_code            = custom_error_response.value.error_code
-#       response_page_path    = custom_error_response.value.response_page_path
-#       response_code         = custom_error_response.value.response_code
-#     }
-#   }
+      target_origin_id = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
+      viewer_protocol_policy = "redirect-to-https"
+      compress               = true
+    }
+  }
 
+  dynamic "ordered_cache_behavior" {
+    for_each = var.amplify_microservice_routes
+
+    content {
+      path_pattern     = "/${ordered_cache_behavior.value.service_prefix}~*"
+      allowed_methods  = [
+        "DELETE",
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT"
+      ]
+
+      cached_methods   = [
+        "GET",
+        "HEAD"
+      ]
+
+      forwarded_values {
+        query_string = false
+        cookies {
+          forward = "none"
+        }
+      }
+
+      lambda_function_association {
+        event_type = "origin-request"
+        lambda_arn = module.lambda_rewrite_origin_branch_requests.function_qualified_arn
+      }
+
+      target_origin_id = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
+      viewer_protocol_policy = "redirect-to-https"
+      compress               = true
+    }
+  }
 }
 
