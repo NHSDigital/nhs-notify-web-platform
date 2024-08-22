@@ -1,10 +1,10 @@
-module "lambda_remove_origin_request_path" {
+module "lambda_rewrite_origin_branch_requests" {
   source = "../../modules/lambda"
   providers = {
     aws = aws.us-east-1
   }
 
-  function_name = "remove-origin-request-path"
+  function_name = "rewrite-origin-branch-requests"
   description   = "A function for removing the request path on origin requests"
 
   aws_account_id = var.aws_account_id
@@ -23,7 +23,7 @@ module "lambda_remove_origin_request_path" {
 
   function_s3_bucket      = local.acct.s3_buckets["lambda_function_artefacts"]["id"]
   function_code_base_path = local.aws_lambda_functions_dir_path
-  function_code_dir       = "remove-origin-request-path/src"
+  function_code_dir       = "rewrite-origin-branch-requests/src"
   function_include_common = true
   function_module_name    = "index"
   handler_function_name   = "handler"
@@ -31,12 +31,13 @@ module "lambda_remove_origin_request_path" {
   memory                  = 128
   timeout                 = 30
   log_level               = var.log_level
+  lambda_at_edge          = true
 
   force_lambda_code_deploy = var.force_lambda_code_deploy
   enable_lambda_insights   = false
 }
 
-data "aws_iam_policy_document" "lambda_remove_origin_request_path" {
+data "aws_iam_policy_document" "lambda_rewrite_origin_branch_requests" {
   statement {
     sid    = "KMSPermissions"
     effect = "Allow"

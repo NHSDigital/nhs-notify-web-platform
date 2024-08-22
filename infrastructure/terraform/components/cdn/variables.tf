@@ -86,3 +86,12 @@ variable "waf_rate_limit_cdn" {
   description = "The rate limit is the maximum number of CDN requests from a single IP address that are allowed in a five-minute period"
   default     = 20000
 }
+
+variable "amplify_microservice_routes" {
+  type = list(object({
+          service_prefix  = string,
+          root_dns_record = string,
+        }))
+  description = "An object representing the amplify microservice routing configration"
+  default = []
+}
