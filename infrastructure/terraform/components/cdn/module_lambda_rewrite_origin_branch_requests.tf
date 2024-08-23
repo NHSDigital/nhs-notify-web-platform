@@ -1,5 +1,5 @@
 module "lambda_rewrite_origin_branch_requests" {
-  source = "../../modules/lambda"
+  source = "git::https://github.com/NHSDigital/nhs-notify-shared-modules.git//infrastructure/modules/lambda?ref=v1.0.0"
   providers = {
     aws = aws.us-east-1
   }
