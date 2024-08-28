@@ -48,8 +48,14 @@ resource "aws_cloudfront_distribution" "main" {
 
   # Github Web-CMS behaviour
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
+    allowed_methods = [
+      "GET",
+      "HEAD",
+    ]
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
     target_origin_id = "github-nhs-notify-web-cms"
 
     forwarded_values {
@@ -96,60 +102,31 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
+
+  # Routes to account for branches like /auth~mybranch123
   dynamic "ordered_cache_behavior" {
     for_each = var.amplify_microservice_routes
+
     content {
-      path_pattern     = "/${ordered_cache_behavior.value.service_prefix}"
-      allowed_methods  = [
+      path_pattern    = "/${ordered_cache_behavior.value.service_prefix}~*"
+      allowed_methods = [
         "DELETE",
         "GET",
         "HEAD",
         "OPTIONS",
         "PATCH",
         "POST",
-        "PUT"
+        "PUT",
       ]
 
-      cached_methods   = [
-        "GET",
-        "HEAD"
-      ]
-
-      forwarded_values {
-        query_string = false
-        cookies {
-          forward = "none"
-        }
-      }
-
-      target_origin_id = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
-      viewer_protocol_policy = "redirect-to-https"
-      compress               = true
-    }
-  }
-
-  dynamic "ordered_cache_behavior" {
-    for_each = var.amplify_microservice_routes
-
-    content {
-      path_pattern     = "/${ordered_cache_behavior.value.service_prefix}~*"
-      allowed_methods  = [
-        "DELETE",
+      cached_methods = [
         "GET",
         "HEAD",
-        "OPTIONS",
-        "PATCH",
-        "POST",
-        "PUT"
-      ]
-
-      cached_methods   = [
-        "GET",
-        "HEAD"
       ]
 
       forwarded_values {
         query_string = false
+        headers      = ["Authorization"]
         cookies {
           forward = "none"
         }
@@ -160,7 +137,40 @@ resource "aws_cloudfront_distribution" "main" {
         lambda_arn = module.lambda_rewrite_origin_branch_requests.function_qualified_arn
       }
 
-      target_origin_id = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
+      target_origin_id       = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
+      viewer_protocol_policy = "redirect-to-https"
+      compress               = true
+    }
+  }
+
+  dynamic "ordered_cache_behavior" {
+    for_each = var.amplify_microservice_routes
+    content {
+      path_pattern    = "/${ordered_cache_behavior.value.service_prefix}*"
+      allowed_methods = [
+        "DELETE",
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT",
+      ]
+
+      cached_methods = [
+        "GET",
+        "HEAD",
+      ]
+
+      forwarded_values {
+        query_string = false
+        headers      = ["Authorization"]
+        cookies {
+          forward = "none"
+        }
+      }
+
+      target_origin_id       = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
       viewer_protocol_policy = "redirect-to-https"
       compress               = true
     }
