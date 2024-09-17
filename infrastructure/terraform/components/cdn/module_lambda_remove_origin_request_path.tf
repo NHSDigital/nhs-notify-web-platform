@@ -1,5 +1,6 @@
 module "lambda_remove_origin_request_path" {
-  source = "git::https://github.com/NHSDigital/nhs-notify-shared-modules.git//infrastructure/modules/lambda?ref=v1.0.0"
+  source = "git::https://github.com/NHSDigital/nhs-notify-shared-modules.git//infrastructure/modules/lambda?ref=v1.0.1"
+
   providers = {
     aws = aws.us-east-1
   }
