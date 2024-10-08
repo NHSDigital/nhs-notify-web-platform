@@ -33,7 +33,7 @@ resource "aws_cloudfront_distribution" "main" {
   # CMS-Web Template origin
   origin {
     domain_name = "nhsdigital.github.io"
-    origin_path = "/nhs-notify-web-cms"
+    origin_path = "/nhs-notify-web-cms-dev"
     origin_id   = "github-nhs-notify-web-cms"
 
     custom_origin_config {
