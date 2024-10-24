@@ -87,7 +87,7 @@ jobs:
               "https://api.github.com/repos/NHSDigital/nhs-notify-internal/actions/runs?event=workflow_dispatch&status=in_progress" \
               | jq -r '.workflow_runs[0].id')
 
-            if [ -n "$run_id" && "$run_id" != null ]; then
+            if [[ -n "$run_id" && "$run_id" != null ]]; then
               echo "Found workflow run with ID: $run_id"
               break
             fi
