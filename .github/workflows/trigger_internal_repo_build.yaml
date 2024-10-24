@@ -30,7 +30,7 @@ concurrency:
   group: ${{ inputs.tf_environment }}-${{ inputs.tf_group }}-${{ inputs.tf_component }}-${{ inputs.tf_action }}
 
 jobs:
-  plan:
+  trigger:
     runs-on: ubuntu-latest
 
     permissions:
@@ -38,6 +38,8 @@ jobs:
       contents: read
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Trigger nhs-notify-internal static environment workflow deployment
         shell: bash
         run: |
@@ -111,14 +113,14 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.PR_TRIGGER_PAT }}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              "https://api.github.com/repos/myrepo/actions/runs/$run_id" \
+              "https://api.github.com/repos/NHSDigital/nhs-notify-internal/actions/runs/$run_id" \
               | jq -r '.status')
 
             conclusion=$(curl -s \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.PR_TRIGGER_PAT }}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              "https://api.github.com/repos/myrepo/actions/runs/$run_id" \
+              "https://api.github.com/repos/NHSDigital/nhs-notify-internal/actions/runs/$run_id" \
               | jq -r '.conclusion')
 
             if [ "$status" == "completed" ]; then
