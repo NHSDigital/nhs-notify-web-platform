@@ -14,7 +14,6 @@ concurrency:
 jobs:
   deploy-main:
     name: Deploy changes to main
-    runs-on: ubuntu-latest
 
     permissions:
       id-token: write
@@ -25,15 +24,11 @@ jobs:
       matrix:
         component: [acct, cdn]
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Trigger nhs-notify-internal static environment workflow deployments
-        uses: ./.github/workflows/trigger_internal_repo_build.yaml
-        with:
-          secrets: inherit
-          release_version: main
-          tf_environment: "main"
-          tf_group: "nhs-notify-web-dev"
-          tf_component: ${{ matrix.component }}
-          tf_action: "apply"
+    uses: ./.github/workflows/trigger_internal_repo_build.yaml
+    with:
+      release_version: main
+      tf_environment: "main"
+      tf_group: "nhs-notify-web-dev"
+      tf_component: ${{ matrix.component }}
+      tf_action: "apply"
+    secrets: inherit
