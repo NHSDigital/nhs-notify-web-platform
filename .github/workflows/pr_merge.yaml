@@ -25,10 +25,10 @@ jobs:
         component: [acct, cdn]
 
     uses: ./.github/workflows/trigger_internal_repo_build.yaml
+    secrets: inherit
     with:
       release_version: main
       tf_environment: "main"
       tf_group: "nhs-notify-web-dev"
       tf_component: ${{ matrix.component }}
       tf_action: "apply"
-    secrets: inherit
