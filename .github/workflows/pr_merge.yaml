@@ -1,8 +1,10 @@
 name: PR Merged
 
 on:
-  release:
-    types: ["published"] # Inherits all input defaults
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
