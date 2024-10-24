@@ -43,6 +43,7 @@ jobs:
       - name: Trigger nhs-notify-internal static environment workflow deployment
         shell: bash
         run: |
+          set -x
           this_repo_name=$(echo ${{ github.repository }} | cut -d'/' -f2)
 
           DISPATCH_EVENT=$(jq -ncM \
@@ -66,6 +67,7 @@ jobs:
           # Trigger The workflow
           curl -L \
             --fail \
+            --silent \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.PR_TRIGGER_PAT }}" \
@@ -78,6 +80,7 @@ jobs:
           # Poll GitHub API to check the workflow status
           run_id=""
           for i in {1..60}; do
+            sleep 10
             run_id=$(curl -s \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.PR_TRIGGER_PAT }}" \
@@ -89,9 +92,7 @@ jobs:
               echo "Found workflow run with ID: $run_id"
               break
             fi
-
             echo "Waiting for workflow to start..."
-            sleep 10
           done
 
           if [[ -z "$run_id" || "$run_id" == null ]]; then
@@ -101,6 +102,7 @@ jobs:
 
           # Wait for workflow completion
           while true; do
+            sleep 10
             status=$(curl -s \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.PR_TRIGGER_PAT }}" \
@@ -126,5 +128,5 @@ jobs:
             fi
 
             echo "Workflow still running..."
-            sleep 30
+            sleep 20
           done
