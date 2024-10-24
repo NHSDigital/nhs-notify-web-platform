@@ -16,6 +16,10 @@ jobs:
     name: Deploy changes to main
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     strategy:
       max-parallel: 1
       matrix:
