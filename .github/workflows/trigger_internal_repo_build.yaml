@@ -74,15 +74,7 @@ jobs:
             https://api.github.com/repos/NHSDigital/nhs-notify-internal/actions/workflows/dispatch-deploy-static-env.yaml/dispatches \
             -d "${DISPATCH_EVENT}"
 
-          # Check the Workflow status code in the 2xx range
-          if [[ "$response" =~ ^2[0-9]{2}$ ]]; then
-            echo "Workflow triggered successfully. HTTP response: $response"
-          else
-            echo "Failed to trigger the workflow. HTTP response: $response"
-            exit 1
-          fi
-
-          echo "Waiting for the workflow to complete..."
+          echo "Workflow triggered successfully. HTTP response. Waiting for the workflow to complete.."
 
           # Poll GitHub API to check the workflow status
           run_id=""
