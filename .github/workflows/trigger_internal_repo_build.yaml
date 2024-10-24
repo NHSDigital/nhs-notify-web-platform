@@ -79,8 +79,7 @@ jobs:
 
           # Poll GitHub API to check the workflow status
           run_id=""
-          for i in {1..60}; do
-            sleep 10
+          for i in {1..12}; do
             run_id=$(curl -s \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.PR_TRIGGER_PAT }}" \
@@ -88,11 +87,13 @@ jobs:
               "https://api.github.com/repos/NHSDigital/nhs-notify-internal/actions/runs?event=workflow_dispatch&status=in_progress" \
               | jq -r '.workflow_runs[0].id')
 
-            if [ -n "$run_id" ]; then
+            if [ -n "$run_id" && "$run_id" != null ]; then
               echo "Found workflow run with ID: $run_id"
               break
             fi
+
             echo "Waiting for workflow to start..."
+            sleep 10
           done
 
           if [[ -z "$run_id" || "$run_id" == null ]]; then
