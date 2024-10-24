@@ -94,7 +94,7 @@ jobs:
             sleep 10
           done
 
-          if [ -z "$run_id" ]; then
+          if [[ -z "$run_id" || "$run_id" == null ]]; then
             echo "Failed to get the workflow run ID. Exiting."
             exit 1
           fi
