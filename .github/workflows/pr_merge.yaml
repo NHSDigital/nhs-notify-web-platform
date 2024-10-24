@@ -22,6 +22,8 @@ jobs:
         component: [acct, cdn]
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Trigger nhs-notify-internal static environment workflow deployments
         uses: ./.github/workflows/trigger_internal_repo_build.yaml
         with:
