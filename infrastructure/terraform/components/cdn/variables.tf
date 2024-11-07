@@ -89,9 +89,9 @@ variable "waf_rate_limit_cdn" {
 
 variable "amplify_microservice_routes" {
   type = list(object({
-          service_prefix  = string,
-          root_dns_record = string,
-        }))
+    service_prefix  = string,
+    root_dns_record = string,
+  }))
   description = "An object representing the amplify microservice routing configration"
-  default = []
+  default     = []
 }

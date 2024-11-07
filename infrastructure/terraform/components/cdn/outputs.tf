@@ -5,5 +5,5 @@ output "cloudfront_distribution_url" {
 
 output "cloudfront_distribution_aliases" {
   description = "Cloudfront distribution custom alias URLs"
-  value       = formatlist("https://%s",aws_cloudfront_distribution.main.aliases)
+  value       = formatlist("https://%s", aws_cloudfront_distribution.main.aliases)
 }
