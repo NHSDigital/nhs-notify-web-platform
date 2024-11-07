@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "lambda_rewrite_origin_branch_requests" {
 
     actions = [
       "kms:GenerateDataKey",
-      "kms:Decrypt"]
+    "kms:Decrypt"]
 
     resources = [
       module.kms.key_arn,

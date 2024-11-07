@@ -16,7 +16,8 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   aliases = [
-    local.root_domain_name
+    # See locals_external_aliases.tf
+    local.this_environment_aliases_with_root
   ]
 
   viewer_certificate {
@@ -37,8 +38,8 @@ resource "aws_cloudfront_distribution" "main" {
     origin_id   = "github-nhs-notify-web-cms"
 
     custom_origin_config {
-      http_port = 80
-      https_port = 443
+      http_port              = 80
+      https_port             = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols = [
         "TLSv1.2"
@@ -79,7 +80,7 @@ resource "aws_cloudfront_distribution" "main" {
     compress               = true
   }
 
-# Amplify microservice routing
+  # Amplify microservice routing
   dynamic "origin" {
     for_each = var.amplify_microservice_routes
 
@@ -88,15 +89,15 @@ resource "aws_cloudfront_distribution" "main" {
       origin_id   = "${local.csi}-${origin.value.service_prefix}"
 
       custom_origin_config {
-        http_port = 80
-        https_port = 443
+        http_port              = 80
+        https_port             = 443
         origin_protocol_policy = "https-only"
         origin_ssl_protocols = [
           "TLSv1.2"
         ]
       }
       custom_header {
-        name = "x-amplify-base-url"
+        name  = "x-amplify-base-url"
         value = origin.value.root_dns_record
       }
     }
@@ -108,7 +109,7 @@ resource "aws_cloudfront_distribution" "main" {
     for_each = var.amplify_microservice_routes
 
     content {
-      path_pattern    = "/${ordered_cache_behavior.value.service_prefix}~*"
+      path_pattern = "/${ordered_cache_behavior.value.service_prefix}~*"
       allowed_methods = [
         "DELETE",
         "GET",
@@ -146,7 +147,7 @@ resource "aws_cloudfront_distribution" "main" {
   dynamic "ordered_cache_behavior" {
     for_each = var.amplify_microservice_routes
     content {
-      path_pattern    = "/${ordered_cache_behavior.value.service_prefix}*"
+      path_pattern = "/${ordered_cache_behavior.value.service_prefix}*"
       allowed_methods = [
         "DELETE",
         "GET",

@@ -9,9 +9,9 @@ output "dns_zone" {
 output "s3_buckets" {
   value = {
     lambda_function_artefacts = {
-      arn = module.s3bucket_lambda_artefacts.arn
+      arn    = module.s3bucket_lambda_artefacts.arn
       bucket = module.s3bucket_lambda_artefacts.bucket
-      id  = module.s3bucket_lambda_artefacts.id
+      id     = module.s3bucket_lambda_artefacts.id
     }
   }
 }

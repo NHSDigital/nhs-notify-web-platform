@@ -1,7 +1,7 @@
 resource "aws_wafv2_web_acl" "main" {
-  provider    = aws.us-east-1
+  provider = aws.us-east-1
 
-  name        = "${local.csi}"
+  name        = local.csi
   description = "${var.environment} with no IP Allowlist"
   scope       = "CLOUDFRONT"
 

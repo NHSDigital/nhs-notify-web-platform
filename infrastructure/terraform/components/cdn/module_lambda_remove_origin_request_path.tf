@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "lambda_remove_origin_request_path" {
 
     actions = [
       "kms:GenerateDataKey",
-      "kms:Decrypt"]
+    "kms:Decrypt"]
 
     resources = [
       module.kms.key_arn,

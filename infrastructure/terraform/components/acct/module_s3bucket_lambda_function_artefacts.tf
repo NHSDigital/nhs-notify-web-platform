@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "s3bucket_lambda_artefacts" {
     ]
 
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${var.aws_account_id}:root"
       ]
@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "s3bucket_lambda_artefacts" {
     ]
 
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${var.aws_account_id}:root"
       ]
