@@ -89,9 +89,28 @@ variable "waf_rate_limit_cdn" {
 
 variable "amplify_microservice_routes" {
   type = list(object({
-          service_prefix  = string,
-          root_dns_record = string,
-        }))
+    service_prefix  = string,
+    root_dns_record = string,
+  }))
   description = "An object representing the amplify microservice routing configration"
-  default = []
+  default     = []
+}
+
+variable "cdn_sans" {
+  type        = list(string)
+  description = "Aliases to associate with CDN"
+}
+
+variable "cms_origin" {
+  type = object({
+    domain_name = string,
+    origin_path = string,
+    origin_id   = string
+  })
+  description = "Object to specifiy static domains for CDN"
+  default = {
+    domain_name = "nhsdigital.github.io"
+    origin_path = "/nhs-notify-web-cms-dev"
+    origin_id   = "github-nhs-notify-web-cms"
+  }
 }
