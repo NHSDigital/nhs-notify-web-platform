@@ -25,11 +25,11 @@ module "s3bucket_cf_logs" {
 
       transition = [
         {
-          days = "90"
+          days          = "90"
           storage_class = "STANDARD_IA"
         },
         {
-          days = "180"
+          days          = "180"
           storage_class = "GLACIER"
         }
       ]
@@ -142,7 +142,7 @@ data "aws_iam_policy_document" "s3bucket_cf_logs" {
     ]
 
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${var.aws_account_id}:root"
       ]
@@ -162,7 +162,7 @@ data "aws_iam_policy_document" "s3bucket_cf_logs" {
     ]
 
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${var.aws_account_id}:root"
       ]

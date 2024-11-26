@@ -3,6 +3,8 @@ resource "aws_acm_certificate" "main" {
   domain_name       = local.root_domain_name
   validation_method = "DNS"
 
+  subject_alternative_names = var.cdn_sans
+
   lifecycle {
     create_before_destroy = true
   }
