@@ -70,11 +70,6 @@ resource "aws_cloudfront_distribution" "main" {
       }
     }
 
-    lambda_function_association {
-      event_type = "origin-request"
-      lambda_arn = module.lambda_remove_origin_request_path.function_qualified_arn
-    }
-
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 3600
