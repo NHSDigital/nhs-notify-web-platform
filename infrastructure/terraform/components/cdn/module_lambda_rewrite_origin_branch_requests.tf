@@ -19,7 +19,7 @@ module "lambda_rewrite_origin_branch_requests" {
   kms_key_arn           = module.kms.key_arn
 
   iam_policy_document = {
-    body = data.aws_iam_policy_document.lambda_remove_origin_request_path.json
+    body = data.aws_iam_policy_document.lambda_rewrite_origin_branch_requests.json
   }
 
   function_s3_bucket      = local.acct.s3_buckets["lambda_function_artefacts"]["id"]
