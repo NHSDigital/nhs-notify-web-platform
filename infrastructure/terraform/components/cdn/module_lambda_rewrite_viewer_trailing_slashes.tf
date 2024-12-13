@@ -1,12 +1,12 @@
-module "lambda_rewrite_origin_branch_requests" {
+module "lambda_rewrite_viewer_trailing_slashes" {
   source = "git::https://github.com/NHSDigital/nhs-notify-shared-modules.git//infrastructure/modules/lambda?ref=v1.0.2"
 
   providers = {
     aws = aws.us-east-1
   }
 
-  function_name = "rewrite-origin-branch-requests"
-  description   = "A function for removing the request path on origin requests"
+  function_name = "rewrite-viewer-trailing-slashes"
+  description   = "A function for rewriting the slashes to the end of URLs when the paths attempt"
 
   aws_account_id = var.aws_account_id
   component      = var.component
@@ -19,12 +19,12 @@ module "lambda_rewrite_origin_branch_requests" {
   kms_key_arn           = module.kms.key_arn
 
   iam_policy_document = {
-    body = data.aws_iam_policy_document.lambda_rewrite_origin_branch_requests.json
+    body = data.aws_iam_policy_document.lambda_rewrite_viewer_trailing_slashes.json
   }
 
   function_s3_bucket      = local.acct.s3_buckets["lambda_function_artefacts"]["id"]
   function_code_base_path = local.aws_lambda_functions_dir_path
-  function_code_dir       = "rewrite-origin-branch-requests/src"
+  function_code_dir       = "rewrite-viewer-trailing-slashes/src"
   function_include_common = true
   function_module_name    = "index"
   handler_function_name   = "handler"
@@ -38,7 +38,7 @@ module "lambda_rewrite_origin_branch_requests" {
   enable_lambda_insights   = false
 }
 
-data "aws_iam_policy_document" "lambda_rewrite_origin_branch_requests" {
+data "aws_iam_policy_document" "lambda_rewrite_viewer_trailing_slashes" {
   statement {
     sid    = "KMSPermissions"
     effect = "Allow"
