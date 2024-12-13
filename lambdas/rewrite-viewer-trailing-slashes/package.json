@@ -1,0 +1,20 @@
+{
+  "name": "rewrite-viewer-trailing-slashes",
+  "version": "1.0.0",
+  "description": "AWS Lambda@Edge function for rewriting slashes viewer on URIs",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ]
+  },
+  "author": "NHS Notify",
+  "license": "ISC"
+}
