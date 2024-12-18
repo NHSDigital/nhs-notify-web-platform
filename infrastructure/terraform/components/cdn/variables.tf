@@ -102,9 +102,9 @@ variable "cdn_sans" {
   default     = []
 }
 
-variable "cdn_authorization_header_secret" {
+variable "amplify_basic_auth_secret" {
   type        = string
-  description = "Secret key/password to use for microservice headers - This is entended to be read from CI variables and not commited to any codebase"
+  description = "Secret key/password to use for amplify microservice headers - This is entended to be read from CI variables and not commited to any codebase"
   default     = "unset"
 }
 

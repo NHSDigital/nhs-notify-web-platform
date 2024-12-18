@@ -104,11 +104,11 @@ resource "aws_cloudfront_distribution" "main" {
       }
 
       dynamic "custom_header" {
-        for_each = var.cdn_authorization_header_secret != "unset" ? [1] : []
+        for_each = var.amplify_basic_auth_secret != "unset" ? [1] : []
 
         content {
           name  = "Authorization"
-          value = aws_ssm_parameter.cdn_authorization_header_secret[0].value
+          value = aws_ssm_parameter.amplify_basic_auth_secret[0].value
         }
       }
     }
