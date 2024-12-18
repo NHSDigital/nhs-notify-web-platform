@@ -102,6 +102,15 @@ resource "aws_cloudfront_distribution" "main" {
         name  = "x-amplify-base-url"
         value = origin.value.root_dns_record
       }
+
+      dynamic "custom_header" {
+        for_each = var.cdn_authorization_header_secret != "unset" ? [1] : []
+
+        content {
+          name  = "Authorization"
+          value = aws_ssm_parameter.cdn_authorization_header_secret[0].value
+        }
+      }
     }
   }
 

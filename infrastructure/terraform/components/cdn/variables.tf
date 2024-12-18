@@ -99,6 +99,13 @@ variable "amplify_microservice_routes" {
 variable "cdn_sans" {
   type        = list(string)
   description = "Aliases to associate with CDN"
+  default     = []
+}
+
+variable "cdn_authorization_header_secret" {
+  type        = string
+  description = "Secret key/password to use for microservice headers - This is entended to be read from CI variables and not commited to any codebase"
+  default     = "unset"
 }
 
 variable "cms_origin" {
