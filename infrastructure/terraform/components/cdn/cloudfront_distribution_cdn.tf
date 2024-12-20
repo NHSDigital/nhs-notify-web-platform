@@ -108,7 +108,7 @@ resource "aws_cloudfront_distribution" "main" {
 
         content {
           name  = "Authorization"
-          value = aws_ssm_parameter.amplify_basic_auth_secret[0].value
+          value = "Basic ${base64encode("${origin.value.service_csi}:${aws_ssm_parameter.amplify_basic_auth_secret[0].value}")}"
         }
       }
     }
