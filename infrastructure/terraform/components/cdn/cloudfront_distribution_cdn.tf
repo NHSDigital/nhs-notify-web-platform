@@ -137,7 +137,6 @@ resource "aws_cloudfront_distribution" "main" {
 
       forwarded_values {
         query_string = false
-        headers      = ["Authorization"]
         cookies {
           forward = "none"
         }
@@ -175,7 +174,6 @@ resource "aws_cloudfront_distribution" "main" {
 
       forwarded_values {
         query_string = false
-        headers      = ["Authorization"]
         cookies {
           forward = "none"
         }
