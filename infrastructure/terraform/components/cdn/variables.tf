@@ -99,6 +99,14 @@ variable "amplify_microservice_routes" {
 variable "cdn_sans" {
   type        = list(string)
   description = "Aliases to associate with CDN"
+  default     = []
+}
+
+variable "AMPLIFY_BASIC_AUTH_SECRET" {
+  # Github only does uppercase env vars
+  type        = string
+  description = "Secret key/password to use for amplify microservice headers - This is entended to be read from CI variables and not commited to any codebase"
+  default     = "unset"
 }
 
 variable "cms_origin" {
