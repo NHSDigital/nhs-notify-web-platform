@@ -104,7 +104,7 @@ resource "aws_cloudfront_distribution" "main" {
       }
 
       dynamic "custom_header" {
-        for_each = var.amplify_basic_auth_secret != "unset" ? [1] : []
+        for_each = var.AMPLIFY_BASIC_AUTH_SECRET != "unset" ? [1] : []
 
         content {
           name  = "Authorization"
