@@ -1,5 +1,5 @@
 resource "aws_cloudfront_response_headers_policy" "security_headers" {
-  name = "security-headers-policy"
+  name = "${local.csi}-security-headers-policy"
 
   remove_headers_config {
     items {
