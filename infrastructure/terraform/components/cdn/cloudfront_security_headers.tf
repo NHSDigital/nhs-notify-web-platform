@@ -33,5 +33,17 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
       override = false
       value    = "same-origin"
     }
+
+    items {
+      header   = "Cross-Origin-Opener-Policy"
+      override = false
+      value    = "same-origin"
+    }
+
+    items {
+      header   = "Cross-Origin-Embedder-Policy"
+      override = false
+      value    = "require-corp"
+    }
   }
 }
