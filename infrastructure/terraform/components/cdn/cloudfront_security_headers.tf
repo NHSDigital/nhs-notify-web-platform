@@ -45,5 +45,11 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
       override = false
       value    = "require-corp"
     }
+
+    items {
+      header   = "Permissions-Policy"
+      override = false
+      value    = "Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), fullscreen=()"
+    }
   }
 }
