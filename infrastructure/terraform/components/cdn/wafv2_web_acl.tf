@@ -2,16 +2,76 @@ resource "aws_wafv2_web_acl" "main" {
   provider = aws.us-east-1
 
   name        = local.csi
-  description = "${var.environment} with no IP Allowlist"
+  description = "${var.environment} WAF"
   scope       = "CLOUDFRONT"
 
   default_action {
     allow {}
   }
 
+  dynamic "rule" {
+    for_each = var.enable_github_actions_ip_access ? [1] : []
+
+    content {
+      name     = "GithubActionsIPRestriction"
+      priority = 10
+
+      action {
+        allow {}
+      }
+
+      statement {
+        or_statement {
+          statement {
+            ip_set_reference_statement {
+              arn = aws_wafv2_ip_set.github_actions_ipv4[0].arn
+            }
+          }
+
+          statement {
+            ip_set_reference_statement {
+              arn = aws_wafv2_ip_set.github_actions_ipv6[0].arn
+            }
+          }
+        }
+      }
+
+      visibility_config {
+        metric_name                = "${local.csi}_gha_ip_restrictions_metric"
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
+  rule {
+    name     = "GeoLocationTrafficWhitelist"
+    priority = 20
+
+    action {
+      block {}
+    }
+
+    statement {
+      not_statement {
+        statement {
+          geo_match_statement {
+            country_codes = ["GB"]
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      sampled_requests_enabled   = true
+      metric_name                = "${local.csi}_geo_location_whitelist"
+    }
+  }
+
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
-    priority = 10
+    priority = 30
     override_action {
       none {}
     }
@@ -37,7 +97,7 @@ resource "aws_wafv2_web_acl" "main" {
 
   rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
-    priority = 20
+    priority = 40
     override_action {
       none {}
     }
@@ -56,7 +116,7 @@ resource "aws_wafv2_web_acl" "main" {
 
   rule {
     name     = "AWSManagedRulesSQLiRuleSet"
-    priority = 30
+    priority = 50
     override_action {
       none {}
     }
@@ -75,7 +135,7 @@ resource "aws_wafv2_web_acl" "main" {
 
   rule {
     name     = "AWSManagedRulesAmazonIpReputationList"
-    priority = 40
+    priority = 60
     override_action {
       none {}
     }
@@ -93,8 +153,8 @@ resource "aws_wafv2_web_acl" "main" {
   }
 
   rule {
-    name     = "rate-limit"
-    priority = 50
+    name     = "RateLimit"
+    priority = 100
     action {
       block {}
     }
