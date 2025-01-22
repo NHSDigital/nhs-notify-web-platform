@@ -49,7 +49,7 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
     items {
       header   = "Permissions-Policy"
       override = false
-      value    = "Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), fullscreen=()"
+      value    = "geolocation=(), microphone=(), camera=(), payment=(), fullscreen=()"
     }
   }
 }
