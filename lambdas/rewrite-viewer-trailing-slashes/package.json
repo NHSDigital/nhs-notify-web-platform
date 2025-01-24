@@ -1,7 +1,7 @@
 {
-  "name": "remove-origin-request-path",
+  "name": "rewrite-viewer-trailing-slashes",
   "version": "1.0.0",
-  "description": "AWS Lambda@Edge function for rewriting URIs",
+  "description": "AWS Lambda@Edge function for rewriting slashes viewer on URIs",
   "main": "src/index.js",
   "scripts": {
     "test": "jest"

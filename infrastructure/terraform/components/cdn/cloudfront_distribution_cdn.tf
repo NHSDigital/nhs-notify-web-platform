@@ -15,9 +15,12 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  aliases = [
-    local.root_domain_name
-  ]
+  aliases = flatten([
+    [
+      local.root_domain_name,
+    ],
+    var.cdn_sans
+  ])
 
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate.main.arn
@@ -32,13 +35,13 @@ resource "aws_cloudfront_distribution" "main" {
 
   # CMS-Web Template origin
   origin {
-    domain_name = "nhsdigital.github.io"
-    origin_path = "/nhs-notify-web-cms-dev"
-    origin_id   = "github-nhs-notify-web-cms"
+    domain_name = var.cms_origin.domain_name
+    origin_path = var.cms_origin.origin_path
+    origin_id   = var.cms_origin.origin_id
 
     custom_origin_config {
-      http_port = 80
-      https_port = 443
+      http_port              = 80
+      https_port             = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols = [
         "TLSv1.2"
@@ -68,8 +71,8 @@ resource "aws_cloudfront_distribution" "main" {
     }
 
     lambda_function_association {
-      event_type = "origin-request"
-      lambda_arn = module.lambda_remove_origin_request_path.function_qualified_arn
+        event_type = "viewer-response"
+        lambda_arn = module.lambda_rewrite_viewer_trailing_slashes.function_qualified_arn
     }
 
     viewer_protocol_policy = "redirect-to-https"
@@ -79,7 +82,7 @@ resource "aws_cloudfront_distribution" "main" {
     compress               = true
   }
 
-# Amplify microservice routing
+  # Amplify microservice routing
   dynamic "origin" {
     for_each = var.amplify_microservice_routes
 
@@ -88,27 +91,35 @@ resource "aws_cloudfront_distribution" "main" {
       origin_id   = "${local.csi}-${origin.value.service_prefix}"
 
       custom_origin_config {
-        http_port = 80
-        https_port = 443
+        http_port              = 80
+        https_port             = 443
         origin_protocol_policy = "https-only"
         origin_ssl_protocols = [
           "TLSv1.2"
         ]
       }
       custom_header {
-        name = "x-amplify-base-url"
+        name  = "x-amplify-base-url"
         value = origin.value.root_dns_record
+      }
+
+      dynamic "custom_header" {
+        for_each = var.AMPLIFY_BASIC_AUTH_SECRET != "unset" ? [1] : []
+
+        content {
+          name  = "Authorization"
+          value = "Basic ${base64encode("${origin.value.service_csi}:${aws_ssm_parameter.amplify_basic_auth_secret[0].value}")}"
+        }
       }
     }
   }
-
 
   # Routes to account for branches like /auth~mybranch123
   dynamic "ordered_cache_behavior" {
     for_each = var.amplify_microservice_routes
 
     content {
-      path_pattern    = "/${ordered_cache_behavior.value.service_prefix}~*"
+      path_pattern = "/${ordered_cache_behavior.value.service_prefix}~*"
       allowed_methods = [
         "DELETE",
         "GET",
@@ -126,9 +137,8 @@ resource "aws_cloudfront_distribution" "main" {
 
       forwarded_values {
         query_string = false
-        headers      = ["Authorization"]
         cookies {
-          forward = "none"
+          forward = "all"
         }
       }
 
@@ -146,7 +156,7 @@ resource "aws_cloudfront_distribution" "main" {
   dynamic "ordered_cache_behavior" {
     for_each = var.amplify_microservice_routes
     content {
-      path_pattern    = "/${ordered_cache_behavior.value.service_prefix}*"
+      path_pattern = "/${ordered_cache_behavior.value.service_prefix}*"
       allowed_methods = [
         "DELETE",
         "GET",
@@ -164,9 +174,8 @@ resource "aws_cloudfront_distribution" "main" {
 
       forwarded_values {
         query_string = false
-        headers      = ["Authorization"]
         cookies {
-          forward = "none"
+          forward = "all"
         }
       }
 

@@ -1,11 +1,8 @@
-name: PR Merged
+name: Github Release Created
 
 on:
-  workflow_dispatch:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  release:
+    types: ["published"] # Inherits all input defaults
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,9 +24,9 @@ jobs:
     uses: ./.github/workflows/reusable_internal_repo_build.yaml
     secrets: inherit
     with:
-      release_version: main
+      release_version: ${{ github.event.release.tag_name }}
       target_workflow: "dispatch-deploy-static-notify-web-gateway.yaml"
       tf_environment: "main"
-      tf_group: "nhs-notify-web-dev"
+      tf_group: "nhs-notify-web-nonprod"
       tf_component: ${{ matrix.component }}
       tf_action: "apply"

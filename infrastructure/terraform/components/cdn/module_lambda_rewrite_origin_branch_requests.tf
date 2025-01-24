@@ -1,5 +1,5 @@
 module "lambda_rewrite_origin_branch_requests" {
-  source = "git::https://github.com/NHSDigital/nhs-notify-shared-modules.git//infrastructure/modules/lambda?ref=v1.0.1"
+  source = "git::https://github.com/NHSDigital/nhs-notify-shared-modules.git//infrastructure/modules/lambda?ref=v1.0.2"
 
   providers = {
     aws = aws.us-east-1
@@ -19,7 +19,7 @@ module "lambda_rewrite_origin_branch_requests" {
   kms_key_arn           = module.kms.key_arn
 
   iam_policy_document = {
-    body = data.aws_iam_policy_document.lambda_remove_origin_request_path.json
+    body = data.aws_iam_policy_document.lambda_rewrite_origin_branch_requests.json
   }
 
   function_s3_bucket      = local.acct.s3_buckets["lambda_function_artefacts"]["id"]
@@ -30,7 +30,7 @@ module "lambda_rewrite_origin_branch_requests" {
   handler_function_name   = "handler"
   runtime                 = "nodejs20.x"
   memory                  = 128
-  timeout                 = 30
+  timeout                 = 5
   log_level               = var.log_level
   lambda_at_edge          = true
 
@@ -44,8 +44,9 @@ data "aws_iam_policy_document" "lambda_rewrite_origin_branch_requests" {
     effect = "Allow"
 
     actions = [
+      "kms:Decrypt",
       "kms:GenerateDataKey",
-      "kms:Decrypt"]
+    ]
 
     resources = [
       module.kms.key_arn,
