@@ -10,8 +10,8 @@ resource "aws_cloudfront_distribution" "main" {
 
   restrictions {
     geo_restriction {
-      restriction_type = "whitelist"
-      locations        = ["GB"]
+      restriction_type = "none" # Moved to WAF
+      locations        = [] # Moved to WAF
     }
   }
 
