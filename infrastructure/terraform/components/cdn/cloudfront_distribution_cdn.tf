@@ -71,8 +71,8 @@ resource "aws_cloudfront_distribution" "main" {
     }
 
     lambda_function_association {
-        event_type = "viewer-response"
-        lambda_arn = module.lambda_rewrite_viewer_trailing_slashes.function_qualified_arn
+      event_type = "viewer-response"
+      lambda_arn = module.lambda_rewrite_viewer_trailing_slashes.function_qualified_arn
     }
 
     viewer_protocol_policy = "redirect-to-https"
@@ -80,6 +80,8 @@ resource "aws_cloudfront_distribution" "main" {
     default_ttl            = 3600
     max_ttl                = 86400
     compress               = true
+
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers.id
   }
 
   # Amplify microservice routing
@@ -150,6 +152,8 @@ resource "aws_cloudfront_distribution" "main" {
       target_origin_id       = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
       viewer_protocol_policy = "redirect-to-https"
       compress               = true
+
+      response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers.id
     }
   }
 
@@ -182,6 +186,8 @@ resource "aws_cloudfront_distribution" "main" {
       target_origin_id       = "${local.csi}-${ordered_cache_behavior.value.service_prefix}"
       viewer_protocol_policy = "redirect-to-https"
       compress               = true
+
+      response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers.id
     }
   }
 }
