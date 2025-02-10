@@ -63,7 +63,7 @@ variable "root_domain_name" {
   default     = "nonprod.nhsnotify.national.nhs.uk"
 }
 
-variable "obs_account_id" {
+variable "observability_account_id" {
   type        = string
   description = "The Observability Account ID that needs access"
 }
