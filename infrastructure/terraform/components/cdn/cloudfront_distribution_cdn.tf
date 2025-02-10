@@ -11,7 +11,7 @@ resource "aws_cloudfront_distribution" "main" {
   restrictions {
     geo_restriction {
       restriction_type = "none" # Moved to WAF
-      locations        = [] # Moved to WAF
+      locations        = []     # Moved to WAF
     }
   }
 
@@ -71,8 +71,8 @@ resource "aws_cloudfront_distribution" "main" {
     }
 
     lambda_function_association {
-        event_type = "viewer-response"
-        lambda_arn = module.lambda_rewrite_viewer_trailing_slashes.function_qualified_arn
+      event_type = "viewer-response"
+      lambda_arn = module.lambda_rewrite_viewer_trailing_slashes.function_qualified_arn
     }
 
     viewer_protocol_policy = "redirect-to-https"

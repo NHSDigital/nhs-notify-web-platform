@@ -1,5 +1,5 @@
 resource "aws_wafv2_ip_set" "github_actions_ipv4" {
-  count = var.enable_github_actions_ip_access ? 1:0
+  count = var.enable_github_actions_ip_access ? 1 : 0
 
   provider = aws.us-east-1
 
@@ -11,7 +11,7 @@ resource "aws_wafv2_ip_set" "github_actions_ipv4" {
 }
 
 resource "aws_wafv2_ip_set" "github_actions_ipv6" {
-  count = var.enable_github_actions_ip_access ? 1:0
+  count = var.enable_github_actions_ip_access ? 1 : 0
 
   provider = aws.us-east-1
 
