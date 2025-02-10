@@ -20,7 +20,6 @@ module "s3bucket_cf_logs" {
 
   lifecycle_rules = [
     {
-      prefix  = ""
       enabled = true
 
       transition = [

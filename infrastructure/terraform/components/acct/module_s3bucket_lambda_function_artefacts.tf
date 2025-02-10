@@ -18,7 +18,6 @@ module "s3bucket_lambda_artefacts" {
 
   lifecycle_rules = [
     {
-      prefix  = ""
       enabled = true
 
       noncurrent_version_transition = [
