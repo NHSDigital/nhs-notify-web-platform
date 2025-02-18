@@ -196,6 +196,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   custom_error_response {
     error_code         = 404
+    response_code      = 404
     response_page_path = "/error/not-found"
   }
 }
